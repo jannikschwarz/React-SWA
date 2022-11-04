@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import LoginForm from './components/LoginForm';
+import GameForm from './components/GameForm';
 
 const users = [
     {
@@ -19,18 +20,25 @@ const users = [
     }
 ]
 
+const boardArray = [
+    'A','B','C','A','C','A','B','A','A','C','C','B'
+]
+
+const adminUser = {
+    email: "admin@admin.com",
+    password: "admin1234"
+}
+
 function App(){
-    const adminUser = {
-        email: "admin@admin.com",
-        password: "admin1234"
-    }
 
     const [user, setUser] = useState({name: "", email: ""});
     const [error, setError] = useState("");
+    const [board, setGameBoard] = useState([]);
+    const [width, setWidth] = useState(0);
 
     const login = details => {
         console.log(details);
-        const foundUser = false
+        let foundUser = false
         users.forEach(user => {
             if(user.email == details.email && user.name == details.name && user.password == details.password){
                 foundUser = true;
@@ -42,6 +50,9 @@ function App(){
                 name: details.name,
                 email: details.email
             });
+
+            setGameBoard(boardArray);
+            setWidth(4);
         }else{
             console.log("Details do not match");
             setError("Details do not match");
@@ -82,6 +93,7 @@ function App(){
                 <div className="welcome">
                     <h2>Welcome, <span>{user.name}</span></h2>
                     <button onClick={logout}>Logout</button>
+                    <GameForm board={board} width={width}/>
                 </div>
             ) : (
                 <LoginForm login={login} error={error} register={register}/>

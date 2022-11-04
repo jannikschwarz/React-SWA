@@ -8,9 +8,11 @@ function LoginForm({ login, error, register}) {
 
     const submitHandler = e => {
         e.preventDefault()
-        if(buttonType == "Login"){
+        console.log("Trying to: " + buttonType)
+        console.debug("Trying to: " + buttonType)
+        if(buttonType === "Login"){
             login(details)
-        }else if(buttonType == "Register"){
+        }else if(buttonType === "Register"){
             register(details)
         }
     }
@@ -19,7 +21,7 @@ function LoginForm({ login, error, register}) {
     <form onSubmit={submitHandler}>
         <div className="form-inner">
             <h2>Login</h2>
-            {(error != "") ? (<div className="error">{error}</div>) : ""}
+            {(error !== "") ? (<div className="error">{error}</div>) : ""}
             <div className='form-group'>
                 <label htmlFor="name">Name:</label>
                 <input type="text" name="name" id="name" onChange={e => setDetails({...details, name: e.target.value})} value={details.name}/>
@@ -38,21 +40,4 @@ function LoginForm({ login, error, register}) {
     </form>
   )
 }
-
-const Checkbox = ({ label, checked }) => {
-    const defaultChecked = checked ? checked: false 
-    const [regCheck, setChecked] = useState(false);
-
-    const handleCheckChange = () => {
-        setChecked(!regCheck)
-    };
-
-    return (
-      <div className="checkbox-wrapper">
-        <label>
-            <input type="checkbox" checked={defaultChecked} onChange={handleCheckChange} label="Register"/>
-        </label>
-      </div>
-    );
-  };
 export default LoginForm
