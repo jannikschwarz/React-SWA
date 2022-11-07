@@ -1,33 +1,14 @@
 import React, {useState} from 'react'
 import LoginForm from './components/LoginForm';
 import GameForm from './components/GameForm';
-
-const users = [
-    {
-        name: "bob",
-        email: "bob@gmail.com",
-        password: "bob1234"
-    },
-    {
-        name: "Jannik",
-        email: "jannik@gmail.com",
-        password: "jannik1234"
-    },
-    {
-        name: "dave",
-        email: "dave@gmail.com",
-        password: "dave1234"
-    }
-]
+import axios from 'axios';
 
 const boardArray = [
-    'A','B','C','A','C','A','B','A','A','C','C','B'
+    'A','B','C','A',
+    'C','A','B','A',
+    'A','C','C','B'
 ]
 
-const adminUser = {
-    email: "admin@admin.com",
-    password: "admin1234"
-}
 
 function App(){
 
@@ -35,56 +16,65 @@ function App(){
     const [error, setError] = useState("");
     const [board, setGameBoard] = useState([]);
     const [width, setWidth] = useState(0);
+    let token;
+    let gameStart = false; 
+
 
     const login = details => {
-        console.log(details);
-        let foundUser = false
-        users.forEach(user => {
-            if(user.email == details.email && user.name == details.name && user.password == details.password){
-                foundUser = true;
-            }
-        });
-        if(details.email == adminUser.email && details.password == adminUser.password || foundUser){
-            console.log("Logged in");
+        axios.post('http://localhost:9090/login',{
+            password: details.password,
+            username: details.name
+        }).then(function(response){
+            setGameBoard(boardArray);
+            setWidth(4);
+            console.log(response)
+            token = response.data.token
             setUser({
                 name: details.name,
                 email: details.email
-            });
-
-            setGameBoard(boardArray);
-            setWidth(4);
-        }else{
-            console.log("Details do not match");
-            setError("Details do not match");
-        }
+            })
+        }).catch(function(error){
+            console.log(error);
+            console.log("Failed to login")
+            setError("Failed to login");
+        })
     }
 
     const register = details => {
-        let succesful = false;
-        users.forEach(user => {
-            if(user.email == details.email){
-                succesful = false;
-                setError("Cannot register, Email already exists");
-            }else if(details.name == "" || details.email == "" || details.password == ""){
-                succesful = false;
-                setError("A input is invald");
-            }else{
-                succesful = true
-            }
-        });
-
-        console.log(succesful)
-        if(succesful){
-            users.push(details.name, details.email, details.password)
+        axios.post('http://localhost:9090/users',{
+            username: details.name,
+            email: details.email, 
+            password: details.password
+        }).then(function(response){
+            setGameBoard(boardArray);
+            setWidth(4);
             setUser({
                 name: details.name,
                 email: details.email
-            });
-        }
+            })
+        }).catch(function(error) {
+            setError("Register failed due to existing user");
+        })
     }
 
     const logout = () => {
-        setUser({name: "", email: ""});
+        axios.post("http://localhost:9090/logout?" + token).then(function(response){
+            setUser({name: "", email: ""});
+        }).catch(function(error){
+            console.log(error);
+        })
+    }
+
+    const startGame = () => {
+        const gameID = Math.floor(Math.random() * 1000);
+        axios.post('http://localhost:9090/games',{
+            id: gameID,
+            user: user.name,
+            score: 0,
+            completed: false
+        }).then(function(response){
+        }).catch(function(error) {
+        })
     }
 
     return ( 
@@ -93,7 +83,9 @@ function App(){
                 <div className="welcome">
                     <h2>Welcome, <span>{user.name}</span></h2>
                     <button onClick={logout}>Logout</button>
-                    <GameForm board={board} width={width}/>
+                    <div>{gameStart ? <p>Game started</p> : <p></p>}</div>
+                    <button onClick={startGame()}>Start Game</button>
+                    <GameForm board={boardArray} width={width} user={user}/>
                 </div>
             ) : (
                 <LoginForm login={login} error={error} register={register}/>

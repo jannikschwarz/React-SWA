@@ -1,76 +1,70 @@
 import React, {useEffect, useState} from 'react'
 import '../table.css'
+import axios from 'axios'
 
-let currentRow = 0;
-let currentCol = 0;
-const position = {
+let position = {
     row: "",
     col: ""
 }
 
-function GameForm({board, width}){
-    const [pos, setPos] = useState(position);
+function GameForm({board, width, id, user}){
+    let rows = board.length / width;
+    let repeats = board.slice(0, rows);
+    let curretRow = 0;
+    let pos1 = undefined;
+    let pos2 = undefined;
+    let gameStart = false; 
 
-    let currentE = 1;
-
-
-    const pressedHandler = e => {
-        if(currentE == 1){
-
-        }
+    const getRow = () => {
+        let toReturn = board.slice(curretRow, curretRow + width);
+        curretRow += width
+        return toReturn
     }
 
-    return <form onSubmit={pressedHandler}>
-        {board.map((element, index) => (
-            <div>
-                <input type="submit" value={element} onClick={() => 
-                    setPos({row:currentRow,col:currentCol})}/>
-            </div>
-        ))}
-    </form>
-}
+    const onValueClick = (position) => {
+        if(pos1 == undefined){
+            pos1 = position
+        }else{
+            pos2 = position
+        }
 
-/*const GameForm = ({board, width}) => {
+        move();
+        pos1 = undefined;
+        pos2 = undefined;
+    }
 
+    const move = () => {
+        console.log("Position clicked");
+    }
 
-        {board.length > 0 && (
-            <table cellSpacing="0" style={{padding: '5px 10px'}}>
-                <tbody>
-                    {Object.values(board).map((object, index) => (
-                        <tr key={index}>
-                            {Object.values(object).map((value, index2) => (
-                                <td key={index2}>{value}</td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        )}
+    const startGame = () => {
+        const gameID = Math.floor(Math.random() * 1000);
+        axios.post('http://localhost:9090/games',{
+            id: gameID,
+            user: user.name,
+            score: 0,
+            completed: false
+        }).then(function(response){
+            
+        }).catch(function(error) {
+        })
+    }
 
-    
-    boardArray = board;
     return (
-        <table>
+        <table cellPadding="0" style ={{padding: '5px 10px'}}>
             <tbody>
-                {board.forEach(element => {
-                    {console.log(element)}
-                    <tr>
-                        <td>{element}</td>
+                {repeats.map((value, index) => (
+                    <tr key={index}>
+                        {getRow().map((value2, index2) => (
+                            <td key={index2}>
+                                <button onClick={onValueClick(position = {row: index, col: index2})}>{value2}</button>
+                            </td>
+                        ))}
                     </tr>
-                })}
+                ))}
             </tbody>
         </table>
     )
 }
-
-function BoardItem({item, width}){
-    if(currentIndex > width){
-        currentIndex++;
-        return <tr><td>{item}</td></tr>        
-    }else{ 
-        currentIndex++;
-        return <td>{item}</td>
-    }
-}*/
 
 export default GameForm
