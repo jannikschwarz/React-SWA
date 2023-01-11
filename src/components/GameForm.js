@@ -57,7 +57,7 @@ function GameForm({board, width, id, user}){
                     <tr key={index}>
                         {getRow().map((value2, index2) => (
                             <td key={index2}>
-                                <button onClick={onValueClick(position = {row: index, col: index2})}>{value2}</button>
+                                <button onClick={() => onValueClick({row: index, col:index2})}>{value2}</button>
                             </td>
                         ))}
                     </tr>
